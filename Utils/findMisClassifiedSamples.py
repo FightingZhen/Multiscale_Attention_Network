@@ -74,7 +74,6 @@ if __name__ == '__main__':
     rootFileName = getRootFileName(label_fdir)
     print(rootFileName)
 
-
     scoreFileName = 'fc_attention_y_score.txt'
     labelFileName = 'fc_attention_test_label.txt'
 

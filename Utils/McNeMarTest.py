@@ -1,7 +1,7 @@
 import numpy as np
 
-score_dir = 'D:/Workspace/DLD_Classification/model_results_ROC/after-softmax/score/'
-label_dir = 'D:/Workspace/DLD_Classification/model_results_ROC/after-softmax/label/'
+score_dir = 'D:/Workspace/DLD_Classification/Major_Review/McNeMar_Test/score/'
+label_dir = 'D:/Workspace/DLD_Classification/Major_Review/McNeMar_Test/label/'
 
 
 def locateMaximumPrediction(line):
@@ -134,5 +134,36 @@ def main():
             proposedMethod, comparedMethod[i], computeVariance(mcnemar_mean_mat)))
 
 
+def main_major_review():
+    # Major Review阶段单独计算Concat版本的模型与我们提出的模型间的McNeMar-Test
+    proposedMethod = 'fc_attention'
+    comparedMethod = ['proposed_concat']
+
+    proposedMethod_ScoreFile = proposedMethod + '_score.txt'
+    proposedMethod_LableFile = proposedMethod + '_label.txt'
+
+    comparedMethod_ScoreFile = [x + '_score.txt' for x in comparedMethod]
+    comparedMethod_LableFile = [y + '_label.txt' for y in comparedMethod]
+
+    print(comparedMethod_ScoreFile)
+    print(comparedMethod_LableFile)
+
+    for i in range(len(comparedMethod_LableFile)):
+        for j in range(7):
+            tmp_mcnemarMatrix = calculateMcnemarMatrix(proposedMethod_ScoreFile, proposedMethod_LableFile,
+                                                       comparedMethod_ScoreFile[i], comparedMethod_LableFile[i], j)
+            print(tmp_mcnemarMatrix.reshape([4, ]).tolist())
+            # print(tmp_mcnemarMatrix)
+            print('Category %d variance between %s and %s is %f \n' % (
+                j, proposedMethod, comparedMethod[i], computeVariance(tmp_mcnemarMatrix)))
+
+        mcnemar_mean_mat = calculateMcnemarMeanMatrix(proposedMethod_ScoreFile, proposedMethod_LableFile,
+                                                      comparedMethod_ScoreFile[i], comparedMethod_LableFile[i])
+        print(mcnemar_mean_mat.reshape([4, ]).tolist())
+        print('Mean variance between %s and %s is %f \n' % (
+            proposedMethod, comparedMethod[i], computeVariance(mcnemar_mean_mat)))
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    main_major_review()

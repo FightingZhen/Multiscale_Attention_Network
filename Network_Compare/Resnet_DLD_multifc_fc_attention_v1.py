@@ -31,7 +31,7 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
 # --------------------hyper parameters-------------------- #
-Training = False
+Training = True
 augmentation = True
 
 NUM_LABELS = 7
@@ -194,21 +194,9 @@ def attention_block(input, block_name):
 
         sig_reshape = tf.reshape(sigmoid, [-1, 1, 1, in_channel])
         attention_mask = input * sig_reshape
-        image_summary(attention_mask, layer_name='attention_mask')
         attention_residual = input + attention_mask
 
     return attention_residual, sigmoid
-
-
-def image_summary(input, layer_name, input_img=False):
-    with tf.variable_scope(layer_name):
-        out_channel = input.get_shape().as_list()[-1]
-        if input_img:
-            tf.summary.image(layer_name, tf.expand_dims(input[:, :, :, out_channel // 2], axis=3), max_outputs=1)
-        else:
-            tf.summary.image(layer_name, tf.expand_dims(input[:, :, :, out_channel // 2], axis=3), max_outputs=1)
-            tf.summary.image(layer_name, tf.expand_dims(input[:, :, :, out_channel // 2 - 5], axis=3), max_outputs=1)
-            tf.summary.image(layer_name, tf.expand_dims(input[:, :, :, out_channel // 2 + 5], axis=3), max_outputs=1)
 
 
 def fc_layer(input, out_channel, layer_name):
@@ -255,7 +243,6 @@ def residual_unit(input, out_channel, ksize, unit_name, down_sampling, first_con
                                ksize=ksize,
                                stride=stride,
                                layer_name='conv1')
-            image_summary(conv1, layer_name='image_summary_conv1')
         else:
             conv1 = bn_layer(input=input, layer_name='conv1_bn')
             conv1 = relu_layer(input=conv1, layer_name='conv1_activation')
@@ -264,7 +251,6 @@ def residual_unit(input, out_channel, ksize, unit_name, down_sampling, first_con
                                ksize=ksize,
                                stride=stride,
                                layer_name='conv1')
-            image_summary(conv1, layer_name='image_summary_conv1')
 
         conv2 = bn_layer(input=conv1, layer_name='conv2_bn')
         conv2 = relu_layer(input=conv2, layer_name='conv2_activation')
@@ -273,7 +259,6 @@ def residual_unit(input, out_channel, ksize, unit_name, down_sampling, first_con
                            ksize=ksize,
                            stride=1,
                            layer_name='conv2')
-        image_summary(conv2, layer_name='image_summary_conv2')
 
         if increase_dim is True:
             identical_map = avg_pool_layer(input, ksize=2, stride=2, layer_name='identical_pool')
@@ -322,7 +307,6 @@ def inference(input,
                            ksize=ksize,
                            stride=1,
                            layer_name='conv')
-        image_summary(unit0, layer_name='unit0_image')
         unit0 = bn_layer(unit0, layer_name='bn')
         unit0 = relu_layer(unit0, layer_name='activation')
 
@@ -516,7 +500,8 @@ def attentionVisualization(tst_img):
         attentionInputDir = '../attentionImage_new/attention_input/'
         attentionOutputDir = '../attentionImage_new/attention_output/'
 
-        saveImages(attentionInput, attentionInputDir, step, sig_weight=np.ones([128, 128], dtype=np.int32), origin=False)
+        saveImages(attentionInput, attentionInputDir, step, sig_weight=np.ones([128, 128], dtype=np.int32),
+                   origin=False)
         saveImages(attentionInput, attentionOutputDir, step, sig_weight=sig_weight, origin=False)
 
 
@@ -630,7 +615,6 @@ def generate_GradCAM_Image(save_dir='../Grad_CAM_Split/'):
             out_counter += 1
 
 
-
 with tf.variable_scope('Learning_rate'):
     global_step = tf.Variable(0, trainable=False)
     learning_rate = tf.train.exponential_decay(learning_rate=lr,
@@ -648,7 +632,6 @@ with tf.variable_scope('Input'):
     with tf.variable_scope('Input_y'):
         y_ = tf.placeholder(tf.int32, shape=[None, NUM_LABELS])
 
-image_summary(x, layer_name='input_image', input_img=True)
 tf.summary.histogram('x_image', x)
 
 y_conv, sec1_att_input, sec1_sig_weight, netLayerSets = inference(input=x,
@@ -752,9 +735,9 @@ if Training:
 
 else:
     print('Test procedure :')
-    # test_procedure(tst_img=tst_img, tst_lab=tst_lab)
+    test_procedure(tst_img=tst_img, tst_lab=tst_lab)
     # plotROCInformation(tst_img, tst_lab)
-    attentionVisualization(tst_img)
+    # attentionVisualization(tst_img)
     # generate_GradCAM_Image()
 
 sess.close()

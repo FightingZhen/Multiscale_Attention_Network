@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('../Pre_Processing/')
 import matplotlib.pyplot as plt
-import Init_dld as init
+import DLD_Data_Initialization as init
 import numpy as np
 import time
 import os
