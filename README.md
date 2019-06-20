@@ -1,5 +1,6 @@
 ## Pulmonary Textures Classification via a Multi-Scale Attention Network
 
+/*
 The prior work that using original image patches and corresponding eigen-value matrices as inputs requires large cost of calculation before deep learning training. Besides, we notice that different textures of diffuse lung diseases exhibit in various scales.
 
 Taking advantage of attention mechanism, we proposed a multi-scale attention network for pulmonary textures classification, the architecture is shown as follows:
@@ -47,3 +48,4 @@ We use Grad-CAM to generate heatmap of feature maps of different categories' fea
 Following examples are mis-classified image patches, followed by detail classification probability:
 
 ![avatar](/fig/mis_classified_examples.png)
+*/
